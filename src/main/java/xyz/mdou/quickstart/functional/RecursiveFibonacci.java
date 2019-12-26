@@ -1,7 +1,11 @@
 package xyz.mdou.quickstart.functional;
 
+interface InCallK {
+    int call(int arg);
+}
+
 public class RecursiveFibonacci {
-    static InCall fib;
+    static InCallK fib;
 
     RecursiveFibonacci() {
         fib = n -> n == 0 ? 0 : n == 1 ? 1 : fib.call(n - 1) + fib.call(n - 2);

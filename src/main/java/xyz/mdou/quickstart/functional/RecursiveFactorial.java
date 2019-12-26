@@ -1,7 +1,11 @@
 package xyz.mdou.quickstart.functional;
 
+interface InCallR {
+    int call(int arg);
+}
+
 public class RecursiveFactorial {
-    static InCall obj;
+    static InCallR obj;
 
     public static void main(String[] args) {
         obj = n -> n == 0 ? 1 : n * obj.call(n - 1);
