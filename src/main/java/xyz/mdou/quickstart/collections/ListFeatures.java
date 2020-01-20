@@ -15,13 +15,13 @@ public class ListFeatures {
         System.out.println("removeFirst(): " + randoms.removeFirst());
         System.out.println("poll(): " + randoms.poll());
         System.out.println(randoms);
-        randoms.addFirst(Randoms.string());
+        randoms.addFirst(Randoms.string(8));
         System.out.println("after addFirst(): " + randoms);
-        randoms.offer(Randoms.string());
+        randoms.offer(Randoms.string(8));
         System.out.println("after offer(): " + randoms);
-        randoms.add(Randoms.string());
+        randoms.add(Randoms.string(8));
         System.out.println("after add(): " + randoms);
-        randoms.addLast(Randoms.string());
+        randoms.addLast(Randoms.string(8));
         System.out.println("after addLast():" + randoms);
         System.out.println("removeLast(): " + randoms.removeLast());
         System.out.println(randoms);
