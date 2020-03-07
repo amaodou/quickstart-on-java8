@@ -1,4 +1,4 @@
-package xyz.mdou.quickstart.leetcode;
+package xyz.mdou.quickstart.leetcode.codinginterview;
 
 /**
  * 面试题06. 从尾到头打印链表

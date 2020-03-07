@@ -1,4 +1,4 @@
-package xyz.mdou.quickstart.leetcode;
+package xyz.mdou.quickstart.leetcode.codinginterview;
 
 import org.junit.Assert;
 import org.junit.Test;
