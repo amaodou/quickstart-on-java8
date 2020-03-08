@@ -1,10 +1,9 @@
-package xyz.mdou.quickstart.leetcode.codinginterview;
+package xyz.mdou.quickstart.leetcode.lcof;
 
 import lombok.ToString;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.Stack;
 
 /**
  * 面试题06. 从尾到头打印链表

@@ -1,4 +1,4 @@
-package xyz.mdou.quickstart.leetcode.codinginterview;
+package xyz.mdou.quickstart.leetcode.lcof;
 
 
 /**
