@@ -54,6 +54,8 @@ public class MyBlockingQueue<E> {
             putIndex = 0;
         }
         count += 1;
+        System.out.printf("%s put %s at %s, %d\r\n", Thread.currentThread().getName(),
+                e, putIndex, count);
         notEmpty.signal();
     }
 
@@ -64,6 +66,8 @@ public class MyBlockingQueue<E> {
             takeIndex = 0;
         }
         count -= 1;
+        System.out.printf("%s take %s at %s, %d\r\n", Thread.currentThread().getName(),
+                o, takeIndex, count);
         notFull.signal();
         return (E) o;
     }
