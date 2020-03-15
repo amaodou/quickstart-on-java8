@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.StampedLock;
 import java.util.stream.IntStream;
 
@@ -18,7 +19,7 @@ public class StampedLockTest {
             state += 1;
             System.out.printf("%s get writeLock, state %d\r\n",
                     Thread.currentThread().getName(), state);
-            Thread.sleep(1000);
+            TimeUnit.SECONDS.sleep(3);
         } finally {
             stampedLock.unlockWrite(stamp);
         }
@@ -30,7 +31,7 @@ public class StampedLockTest {
             int readState = state;
             System.out.printf("%s get readLock, state %d\r\n",
                     Thread.currentThread().getName(), readState);
-            Thread.sleep(1000);
+            TimeUnit.SECONDS.sleep(1);
         } finally {
             stampedLock.unlockRead(stamp);
         }
@@ -39,24 +40,36 @@ public class StampedLockTest {
     public void optimisticReadLock() throws InterruptedException {
         long stamp = stampedLock.tryOptimisticRead();
         int readState = state;
+        TimeUnit.SECONDS.sleep(1);
         if (!stampedLock.validate(stamp)) {
             stamp = stampedLock.readLock();
             try {
                 readState = state;
-                System.out.printf("%s get optimisticReadLock, state %d\r\n",
+                System.out.printf("%s optimisticRead is not validate, retry get state %d\r\n",
                         Thread.currentThread().getName(), readState);
-                Thread.sleep(1000);
+                TimeUnit.SECONDS.sleep(1);
             } finally {
                 stampedLock.unlock(stamp);
             }
         }
+        System.out.printf("%s optimisticRead is validate, state %d\r\n",
+                Thread.currentThread().getName(), readState);
     }
 
     @Test
     public void testLock() throws InterruptedException {
-        ExecutorService writeExecutor = Executors.newFixedThreadPool(20);
-        IntStream.range(0, 100).forEach(i -> {
-            writeExecutor.submit(() -> {
+        ExecutorService executorService = Executors.newFixedThreadPool(20);
+        IntStream.range(0, 1).forEach(i -> {
+            executorService.submit(() -> {
+                try {
+                    optimisticReadLock();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            });
+        });
+        IntStream.range(0, 1).forEach(i -> {
+            executorService.submit(() -> {
                 try {
                     writeLock();
                 } catch (InterruptedException e) {
@@ -64,9 +77,8 @@ public class StampedLockTest {
                 }
             });
         });
-        ExecutorService readExecutor = Executors.newFixedThreadPool(20);
-        IntStream.range(0, 100).forEach(i -> {
-            readExecutor.submit(() -> {
+        IntStream.range(0, 10).forEach(i -> {
+            executorService.submit(() -> {
                 try {
                     readLock();
                 } catch (InterruptedException e) {
@@ -74,7 +86,6 @@ public class StampedLockTest {
                 }
             });
         });
-        Thread.sleep(60000);
+        TimeUnit.SECONDS.sleep(60);
     }
-
 }

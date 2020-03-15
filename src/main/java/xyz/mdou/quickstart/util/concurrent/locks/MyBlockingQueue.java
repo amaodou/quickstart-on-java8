@@ -1,10 +1,14 @@
 package xyz.mdou.quickstart.util.concurrent.locks;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class MyBlockingQueue<E> {
@@ -119,37 +123,43 @@ public class MyBlockingQueue<E> {
 
     public static void main(String[] args) throws InterruptedException {
         MyBlockingQueue<Integer> queue = new MyBlockingQueue<>(10);
-        ExecutorService pollExecutor = Executors.newFixedThreadPool(100);
-        IntStream.range(0, 1000).forEach(i -> {
-            pollExecutor.submit(() -> {
-                try {
-                    queue.take();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            });
+        List<Thread> takeThreads = IntStream.range(0, 1000).boxed()
+                .map((Function<Integer, Runnable>) i -> () -> {
+                    try {
+                        queue.take();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                })
+                .map(Thread::new)
+                .collect(Collectors.toList());
+        List<Thread> putThreads = IntStream.range(0, 1000).boxed()
+                .map((Function<Integer, Runnable>) i -> () -> {
+                    try {
+                        queue.put(i);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                })
+                .map(Thread::new)
+                .collect(Collectors.toList());
+
+        ExecutorService putExecutor = Executors.newFixedThreadPool(100);
+        putThreads.forEach(putExecutor::submit);
+        ExecutorService takeExecutor = Executors.newFixedThreadPool(100);
+        takeThreads.forEach(takeExecutor::submit);
+
+        List<Thread> threads = new ArrayList<>();
+        threads.addAll(putThreads);
+        threads.addAll(takeThreads);
+        threads.forEach(t -> {
             try {
-                Thread.sleep(10);
+                t.join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         });
-        ExecutorService offerExecutor = Executors.newFixedThreadPool(100);
-        IntStream.range(0, 1000).forEach(i -> {
-            offerExecutor.submit(() -> {
-                try {
-                    queue.put(i);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            });
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        });
-        Thread.sleep(60000);
+        Thread.currentThread().join();
     }
 }
 
